@@ -1,28 +1,30 @@
-name: Hankyung News
+name: Daily News Briefing
 
 on:
   workflow_dispatch:
 
   schedule:
-    - cron: "0 5 * * *"
+    - cron: '0 5 * * *'   # UTC 05:00 = 한국 14:00
 
 jobs:
-
-  run:
-
+  briefing:
     runs-on: ubuntu-latest
 
     steps:
-
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - run: pip install -r requirements.txt
+      - name: Install packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - run: python main.py
+      - name: Run
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           DATABASE_ID: ${{ secrets.DATABASE_ID }}
+        run: python main.py
