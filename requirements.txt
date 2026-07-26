@@ -1,3 +1,6 @@
-requests
-beautifulsoup4
-notion-client
+beautifulsoup4==4.13.4
+requests==2.32.4
+notion-client==2.4.0
+openai>=1.99.9
+python-dotenv==1.1.1
+lxml==6.0.0
