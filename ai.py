@@ -58,7 +58,7 @@ def make_briefing(articles):
 """
 
     response = client.models.generate_content(
-    model="gemini-2.5-flash-lite",
+    model="gemini-3.6-flash",
     contents=SYSTEM_PROMPT + article_text
 )
     return response.text
