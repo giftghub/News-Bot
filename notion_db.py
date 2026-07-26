@@ -107,6 +107,24 @@ def save_to_notion(briefing):
 
     today = datetime.today()
 
+    # -----------------------------
+    # 한줄 정리 추출
+    # -----------------------------
+    opinion = ""
+
+    lines = [line.strip() for line in briefing.split("\n")]
+
+    for i, line in enumerate(lines):
+        if line == "## 한줄 정리":
+            for next_line in lines[i + 1:]:
+                if next_line:
+                    opinion = next_line
+                    break
+            break
+
+    # -----------------------------
+    # 페이지 생성
+    # -----------------------------
     page = notion.pages.create(
         parent={
             "database_id": DATABASE_ID
@@ -126,18 +144,23 @@ def save_to_notion(briefing):
                 "date": {
                     "start": today.strftime("%Y-%m-%d")
                 }
+            },
+
+            "Opinion": {
+                "rich_text": [{
+                    "type": "text",
+                    "text": {
+                        "content": opinion
+                    }
+                }]
             }
 
-            # Opinion 속성을 추가해도
-            # 여기 수정할 필요 없습니다.
         }
     )
 
     page_id = page["id"]
 
     blocks = []
-
-    lines = [line.strip() for line in briefing.split("\n")]
 
     current_section = ""
 
