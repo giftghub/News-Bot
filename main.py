@@ -54,11 +54,36 @@ for a in soup.select("a.news-item, a.txt-cont, h2 a, h3 a"):
 
 print("기사 개수:", len(articles))
 
+def get_article_text(url):
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
+
+    r = requests.get(url, headers=headers)
+    r.raise_for_status()
+
+    soup = BeautifulSoup(r.text, "html.parser")
+
+    paragraphs = soup.select("article p")
+
+    text = []
+
+    for p in paragraphs:
+        t = p.get_text(" ", strip=True)
+        if len(t) > 20:
+            text.append(t)
+
+    return "\n".join(text)
+    
 today = datetime.today()
 
 for rank, (title, link) in enumerate(articles[:2], start=1):
 
     print(f"\n[{rank}] {title}")
+
+    content = get_article_text(link)
+
+    print(content[:500])   # 테스트용
 
     page = notion.pages.create(
         parent={"database_id": DATABASE_ID},
