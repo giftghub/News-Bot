@@ -75,7 +75,6 @@ def get_article_text(url):
 
     return "\n".join(text)
     
-today = datetime.today()
 
 today = datetime.today()
 
@@ -95,20 +94,19 @@ if already_uploaded():
     print("오늘 브리핑이 이미 존재합니다.")
     exit()
 
-for rank, (title, link) in enumerate(articles[:2], start=1):
 
-for rank, (title, link) in enumerate(articles[:2], start=1):
+ for rank, (title, link) in enumerate(articles[:2], start=1):
 
     print(f"\n[{rank}] {title}")
 
-   try:
-    content = get_article_text(link)
-except Exception as e:
-    print(e)
-    continue
+    try:
+        content = get_article_text(link)
+    except Exception as e:
+        print(e)
+        continue
 
-    print(content[:500])   # 테스트용
-
+    print(content[:500])
+     
     page = notion.pages.create(
         parent={"database_id": DATABASE_ID},
         properties={
