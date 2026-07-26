@@ -8,6 +8,9 @@ DATABASE_ID = os.environ["DATABASE_ID"]
 
 notion = Client(auth=NOTION_TOKEN)
 
+db = notion.databases.retrieve(database_id=DATABASE_ID)
+print("Database title:", db["title"][0]["plain_text"])
+
 feed = feedparser.parse("https://www.hankyung.com/feed/all-news")
 
 today = datetime.today()
