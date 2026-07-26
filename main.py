@@ -77,6 +77,26 @@ def get_article_text(url):
     
 today = datetime.today()
 
+today = datetime.today()
+
+def already_uploaded():
+    result = notion.databases.query(
+        database_id=DATABASE_ID,
+        filter={
+            "property": "Date",
+            "date": {
+                "equals": today.strftime("%Y-%m-%d")
+            }
+        }
+    )
+    return len(result["results"]) > 0
+
+if already_uploaded():
+    print("오늘 브리핑이 이미 존재합니다.")
+    exit()
+
+for rank, (title, link) in enumerate(articles[:2], start=1):
+
 for rank, (title, link) in enumerate(articles[:2], start=1):
 
     print(f"\n[{rank}] {title}")
