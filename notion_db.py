@@ -11,8 +11,12 @@ def save_to_notion(briefing):
     today = datetime.today()
 
     notion.pages.create(
-        parent={"database_id": DATABASE_ID},
+        parent={
+            "database_id": DATABASE_ID
+        },
+
         properties={
+
             "Name": {
                 "title": [
                     {
@@ -22,20 +26,25 @@ def save_to_notion(briefing):
                     }
                 ]
             },
+
             "Date": {
                 "date": {
                     "start": today.strftime("%Y-%m-%d")
                 }
             }
         },
+
         children=[
             {
                 "object": "block",
+
                 "type": "paragraph",
+
                 "paragraph": {
                     "rich_text": [
                         {
                             "type": "text",
+
                             "text": {
                                 "content": briefing
                             }
