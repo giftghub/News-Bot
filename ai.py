@@ -1,51 +1,38 @@
 import os
-from openai import OpenAI
+from google import genai
 
-client = OpenAI(
-    api_key=os.environ["OPENAI_API_KEY"]
+client = genai.Client(
+    api_key=os.environ["GEMINI_API_KEY"]
 )
 
-
 SYSTEM_PROMPT = """
-당신은 매일 아침 경제 브리핑을 작성하는 경제 전문 에디터이다.
+당신은 경제 뉴스 에디터입니다.
 
-반드시 아래 형식을 지켜라.
+여러 개의 경제기사를 읽고
+하루 경제 브리핑을 작성하세요.
+
+형식
 
 # 오늘의 경제 브리핑
 
-## 1. 핵심 뉴스 3개
+## 핵심 이슈
 
-각 뉴스마다
+(전체 흐름 요약)
 
-- 제목
-- 세 줄 요약
-- 왜 중요한가
+## 주요 뉴스
 
-작성
+- ...
+- ...
+- ...
 
-## 2. 오늘의 핵심 경제용어
+## 오늘 알아둘 경제용어
 
-경제용어 2개
+- 용어 : 설명
 
-각각 2~3줄 설명
+## 한줄 정리
 
-## 3. 오늘 시장 영향
-
-국내 증시
-
-미국 증시
-
-환율
-
-금리
-
-에 어떤 영향을 줄 가능성이 있는지 설명
-
-## 4. 오늘 한 줄 요약
-
-30자 이내
+...
 """
-
 
 def make_briefing(articles):
 
@@ -54,33 +41,25 @@ def make_briefing(articles):
     for idx, article in enumerate(articles, start=1):
 
         article_text += f"""
+
 기사 {idx}
 
 제목
-{article["title"]}
+{article['title']}
 
 본문
-{article["content"]}
+{article['content'][:2000]}
 
 원문
-{article["url"]}
+{article['url']}
 
-----------------------------------------
+----------------------------
 
 """
 
-    response = client.responses.create(
-        model="gpt-5-mini",
-        input=[
-            {
-                "role": "system",
-                "content": SYSTEM_PROMPT
-            },
-            {
-                "role": "user",
-                "content": article_text
-            }
-        ]
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=SYSTEM_PROMPT + article_text
     )
 
-    return response.output_text
+    return response.text
