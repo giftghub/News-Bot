@@ -1,5 +1,6 @@
 import os
-import feedparser
+import requests
+from bs4 import BeautifulSoup
 from datetime import datetime
 from notion_client import Client
 
@@ -11,23 +12,55 @@ notion = Client(auth=NOTION_TOKEN)
 print("=" * 50)
 print("DATABASE_ID:", DATABASE_ID)
 
-# 데이터베이스 확인
 db = notion.databases.retrieve(database_id=DATABASE_ID)
 print("Database title:", db["title"][0]["plain_text"])
 print("=" * 50)
 
-# RSS 가져오기
-feed = feedparser.parse("https://www.hankyung.com/feed/all-news")
+headers = {
+    "User-Agent": "Mozilla/5.0"
+}
 
-print(f"기사 개수: {len(feed.entries)}")
+url = "https://www.hankyung.com"
+
+response = requests.get(url, headers=headers)
+
+print("HTTP Status:", response.status_code)
+
+response.raise_for_status()
+
+soup = BeautifulSoup(response.text, "html.parser")
+
+articles = []
+
+# 메인 기사 제목 추출
+for a in soup.select("a.news-item, a.txt-cont, h2 a, h3 a"):
+
+    title = a.get_text(strip=True)
+    link = a.get("href")
+
+    if not title:
+        continue
+
+    if not link:
+        continue
+
+    if link.startswith("/"):
+        link = "https://www.hankyung.com" + link
+
+    if link.startswith("https://www.hankyung.com"):
+
+        if (title, link) not in articles:
+            articles.append((title, link))
+
+print("기사 개수:", len(articles))
 
 today = datetime.today()
 
-for rank, article in enumerate(feed.entries[:2], start=1):
+for rank, (title, link) in enumerate(articles[:2], start=1):
 
-    print(f"\n[{rank}] {article.title}")
+    print(f"\n[{rank}] {title}")
 
-    response = notion.pages.create(
+    page = notion.pages.create(
         parent={"database_id": DATABASE_ID},
         properties={
             "Name": {
@@ -51,18 +84,18 @@ for rank, article in enumerate(feed.entries[:2], start=1):
                 "rich_text": [
                     {
                         "text": {
-                            "content": article.title
+                            "content": title
                         }
                     }
                 ]
             },
             "URL": {
-                "url": article.link
+                "url": link
             }
         }
     )
 
-    print("생성 완료!")
-    print("Page URL:", response["url"])
+    print("생성 완료")
+    print(page["url"])
 
 print("\n모든 작업 완료!")
