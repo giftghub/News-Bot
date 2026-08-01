@@ -1,3 +1,9 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+print("UTC :", datetime.utcnow())
+print("KST :", datetime.now(ZoneInfo("Asia/Seoul")))
+
 from crawler import crawl
 from ai import make_briefing
 from notion_db import save_to_notion
