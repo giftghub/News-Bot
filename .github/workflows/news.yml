@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
   schedule:
-    - cron: '0 5 * * *'   # UTC 05:00 = 한국 14:00
+    - cron: '0 14 * * *'   # UTC 05:00 = 한국 14:00
 
 jobs:
   briefing:
